@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-tpb-crawl
+
+  Sample SAM Template for sam-tpb-crawl
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  TpbCrawlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Architectures:
+        - x86_64
+    Metadata:
+      DockerTag: nodejs18.x-v1
+      DockerContext: ./sam-tpb-crawl
+      Dockerfile: Dockerfile
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  TpbCrawlFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt TpbCrawlFunction.Arn
+  TpbCrawlFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt TpbCrawlFunctionRole.Arn
