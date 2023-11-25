@@ -8,13 +8,14 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 10
+    Timeout: 25
 
 Resources:
   TpbCrawlFunction:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
+      MemorySize: 2048
       Architectures:
         - x86_64
     Metadata:
