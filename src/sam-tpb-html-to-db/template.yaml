@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  python3.12
+
+  Sample SAM Template for sam-tpb-html-to-rds
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  TpbHtmlToDBFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      MemorySize: 2048
+      PackageType: Image
+      Architectures:
+        - x86_64
+      Policies:
+        - S3CrudPolicy: { "BucketName": "tpb-snapshots-html" }
+        - DynamoDBCrudPolicy: { "TableName": "tpb-top100-ts" }
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: cron(2 */4 * * ? *)
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./tpb-html-to-db
+      DockerTag: python3.12-v1
+
+Outputs:
+  TpbHtmlToDBFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt TpbHtmlToDBFunction.Arn
+  TpbHtmlToDBFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt TpbHtmlToDBFunction.Arn
