@@ -8,13 +8,13 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 10
+    Timeout: 300
 
 Resources:
   TpbHtmlToDBFunction:
     Type: AWS::Serverless::Function
     Properties:
-      MemorySize: 2048
+      MemorySize: 4096
       PackageType: Image
       Architectures:
         - x86_64

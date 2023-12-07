@@ -17,10 +17,7 @@ def extract_values_from_li(li):
     data["torrent_url"] = "https://thepiratebay.org" + links[1]
 
     # Icons
-    icons = [
-        img["src"].rsplit("/")[-1].split(".gif")[0]
-        for img in torrent_list[0].findAll("img")
-    ]
+    icons = [img["src"].rsplit("/")[-1].split(".gif")[0] for img in li.findAll("img")]
     data["icons"] = icons
 
     # Data cleanup
@@ -45,15 +42,6 @@ def extract_values_from_li(li):
 
     data["seed"] = int(data["seed"])
     data["leech"] = int(data["leech"])
-
-    timestamp_str = file_name.split("tbp_top100_")[1].split(".html")[0]
-    data["timestamp"] = int(
-        datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S").timestamp()
-    )
-
-    # Make a uid key in data from a hash of everything else in the data dict
-    hashable_string = data["torrent_url"] + str(data["timestamp"])
-    data["uid"] = hashlib.md5(hashable_string.encode()).hexdigest()
 
     return data
 
@@ -81,10 +69,21 @@ def lambda_handler(event, context):
             torrent_list = soup.find_all("li", class_="list-entry")
 
             df = pd.DataFrame([extract_values_from_li(li) for li in torrent_list])
+
+            timestamp_str = file_name.split("tbp_top100_")[1].split(".html")[0]
+            df["timestamp"] = timestamp_str
+
+            # Make a uid key in data from a hash of everything else in the data dict
+            hashable_strings = df["torrent_url"] + df["timestamp"].astype(str)
+            df["uid"] = pd.Series(
+                [hashlib.md5(s.encode()).hexdigest() for s in hashable_strings]
+            )
+
             df["timestamp"] = (
                 pd.to_datetime(df.timestamp, format="%Y-%m-%d_%H-%M").astype(int)
                 / 10**9
             ).astype(int)
+
             df_list.append(df)
 
     df = pd.concat(df_list, ignore_index=True)
